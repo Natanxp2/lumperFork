@@ -14,7 +14,6 @@ public static class FGDLexer
 
         while (i < input.Length)
         {
-            // Ignore whitespace
             char c = input[i];
             if (char.IsWhiteSpace(c))
             {
@@ -22,35 +21,31 @@ public static class FGDLexer
                 continue;
             }
 
-            // Ignore comments
             if (c == '/' && i + 1 < input.Length && input[i + 1] == '/')
             {
                 while (i < input.Length && input[i] != '\n') i++;
                 continue;
             }
 
-            // Strings
-            if(c == '"')
+            if (c == '"')
             {
                 i++;
                 int start = i;
-                while ( i < input.Length && input[i] != '"') i++;
+                while (i < input.Length && input[i] != '"') i++;
                 tokens.Add(new Token(TokenType._String, input[start..i]));
                 i++; // Consume end quote
                 continue;
             }
 
-            // Symbols
-            if("@=:[](),".Contains(c))
+            if ("@=:[](),".IndexOf(c) != -1)
             {
                 tokens.Add(new Token(TokenType.Symbol, c.ToString()));
                 i++;
                 continue;
             }
 
-            // Words
             int wStart = i;
-            while (i < input.Length && !char.IsWhiteSpace(input[i]) && !"@=:[](),\"".Contains(input[i]))
+            while (i < input.Length && !char.IsWhiteSpace(input[i]) && "@=:[](),\"".IndexOf(input[i]) == -1)
             {
                 i++;
             }
