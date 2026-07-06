@@ -1,5 +1,6 @@
 namespace Lumper.UI.ViewModels.Shared.Entity;
 
+
 using System.Linq;
 using DynamicData.Binding;
 using Lumper.Lib.Bsp.Lumps.BspLumps;
@@ -92,6 +93,7 @@ public class EntityViewModel : HierarchicalBspNode
     {
         return Properties.OfType<EntityPropertyStringViewModel>().FirstOrDefault(x => x.Key == key)?.Value;
     }
+    
 
     public void ResetClassname()
     {
@@ -118,4 +120,6 @@ public class EntityViewModel : HierarchicalBspNode
         if (Origin is { } origin)
             GameSyncService.Instance.TeleportToOrigin(origin);
     }
+
+
 }

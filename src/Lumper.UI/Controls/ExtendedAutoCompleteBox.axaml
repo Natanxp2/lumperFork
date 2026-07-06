@@ -1,0 +1,67 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:Lumper.UI.Controls">
+
+    <Style Selector="local|ExtendedAutoCompleteBox">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <TextBox Name="PART_TextBox" Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                        <TextBox.InnerLeftContent>
+                            <Button Name="PART_DropdownButton"
+                                Width="20" 
+                                Height="20" 
+                                CornerRadius="4"
+                                VerticalAlignment="Center"
+                                Margin="4 0 0 0"
+                                Padding="0"
+                                Background="Transparent" 
+                                BorderThickness="0" 
+                                Focusable="False" 
+                                Cursor="Hand">
+                                <Path Fill="{DynamicResource TextControlForeground}" Data="M 0 0 L 4 4 L 8 0 Z" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Button>
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+
+                    <Popup Name="PART_Popup" 
+                           PlacementTarget="{Binding ElementName=PART_TextBox}" 
+                           IsOpen="{Binding IsDropdownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" 
+                           IsLightDismissEnabled="True" 
+                           Placement="BottomEdgeAlignedLeft" 
+                           MaxHeight="250" 
+                           MinWidth="{Binding Bounds.Width, ElementName=PART_TextBox}">
+                        
+                        <Border Background="{DynamicResource FlyoutPresenterBackground}" 
+                                BorderBrush="{DynamicResource FlyoutPresenterBorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="4"
+                                Padding="4">
+                            <Grid>
+                                <ListBox Name="PART_StandardList" 
+                                        IsVisible="{Binding !IsBitfieldMode, RelativeSource={RelativeSource TemplatedParent}}" 
+                                        Background="Transparent" BorderThickness="0">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="local:ExtendedAutoCompleteItem">
+                                            <TextBlock Text="{Binding DisplayText}" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+
+                                <ListBox Name="PART_BitfieldList" 
+                                        IsVisible="{Binding IsBitfieldMode, RelativeSource={RelativeSource TemplatedParent}}" 
+                                        Background="Transparent" BorderThickness="0">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="local:ExtendedAutoCompleteItem">
+                                            <CheckBox Content="{Binding DisplayText}" IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                        </Border>
+                    </Popup>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>
