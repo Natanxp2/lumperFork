@@ -130,6 +130,10 @@ public static class FGDParser
                     _ = stream.Consume();
                     entity.Outputs.Add(ParseIO(stream));
                 }
+                else if(stream.Peek().Value.StartsWith("linedivider", StringComparison.OrdinalIgnoreCase))
+                {
+                    _ = ParseProperty(stream);
+                }
                 else
                 {
                     entity.Properties.Add(ParseProperty(stream));
