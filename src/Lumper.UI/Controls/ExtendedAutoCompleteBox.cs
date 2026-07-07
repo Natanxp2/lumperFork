@@ -161,7 +161,6 @@ public class ExtendedAutoCompleteBox : TemplatedControl
 
         UpdateFilteredSuggestions();
         SetDropdownButtonState();
-        if (IsBitfieldMode) CalculateBitfieldSum();
     }
 
     private void OnSuggestionsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
