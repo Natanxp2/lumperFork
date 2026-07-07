@@ -3,6 +3,7 @@ namespace Lumper.UI.ViewModels.Shared.Entity;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Lumper.Lib.Bsp.Struct;
 using Lumper.Lib.ExtensionMethods;
 using Lumper.Lib.FGD;
@@ -205,12 +206,13 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
 {
     private readonly Entity.EntityProperty<EntityIo> _property;
     private string _ioKey;
-    private IReadOnlyCollection<ExtendedAutoCompleteItem> _ioKeySuggestions = [];
     private string _targetEntityName;
     private string _input;
+    private IReadOnlyCollection<ExtendedAutoCompleteItem>? _inputSuggestions;
     private string _parameter;
     private float _delay;
     private int _timesToFire;
+
     public EntityPropertyIoViewModel(Entity.EntityProperty<EntityIo> property, BspNode bspNode)
         : base(property, bspNode)
     {
@@ -225,9 +227,15 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
         this.WhenAnyValue(x => x.ParentEntity.Classname)
             .Subscribe(_ => IOKeySuggestions = FetchIoKeySuggestions());
 
+        this.WhenAnyValue(x => x.TargetEntityName)
+        .Subscribe(_ =>
+        {
+            _inputSuggestions = null;
+            this.RaisePropertyChanged(nameof(InputSuggestions));
+        });
     }
 
-    
+
 
     public string IOKey
     {
@@ -239,15 +247,8 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
         }
     }
 
-    public IReadOnlyCollection<ExtendedAutoCompleteItem> IOKeySuggestions
-    {
-        get => _ioKeySuggestions;
-        set
-        {
-            _ioKeySuggestions = value;
-            OnValueChanged();
-        }
-    }
+    [Reactive]
+    public IReadOnlyCollection<ExtendedAutoCompleteItem> IOKeySuggestions { get; set; } = [];
 
     public string TargetEntityName
     {
@@ -264,7 +265,7 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
         }
     }
 
-    public IReadOnlyCollection<ExtendedAutoCompleteItem> TargetEntityNameSuggestions => 
+    public IReadOnlyCollection<ExtendedAutoCompleteItem> TargetEntityNameSuggestions =>
         BspService.Instance.TargetnameIndex.Suggestions;
 
     public string Input
@@ -282,6 +283,11 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
         }
     }
 
+
+
+    public IReadOnlyCollection<ExtendedAutoCompleteItem> InputSuggestions =>
+        _inputSuggestions ??= FetchInputSuggestions();
+
     public string Parameter
     {
         get => _parameter;
@@ -296,7 +302,7 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
             OnValueChanged();
         }
     }
-  
+
     public float Delay
     {
         get => _delay;
@@ -347,6 +353,27 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
                 var item = new ExtendedAutoCompleteItem
                 {
                     Value = output.Value.Name,
+                };
+                suggestions.Add(item);
+            }
+        }
+        return suggestions;
+    }
+
+    private List<ExtendedAutoCompleteItem> FetchInputSuggestions()
+    {
+        List<ExtendedAutoCompleteItem> suggestions = [];
+
+        string? classname = BspService.Instance.TargetnameIndex.Entries
+        .FirstOrDefault(e => e.Targetname == TargetEntityName)?.Classname;
+
+        if (classname != null && MomentumFGD.Entities.TryGetValue(classname, out FGDEntity? fgdEntity))
+        {
+            foreach (FGDInput input in fgdEntity.Inputs.Values)
+            {
+                var item = new ExtendedAutoCompleteItem
+                {
+                    Value = input.Name
                 };
                 suggestions.Add(item);
             }

@@ -243,8 +243,12 @@
                                                      Grid.Column="2"
                                                      Grid.ColumnSpan="3" />
                       <TextBlock Text="Input" Grid.Row="4" Grid.Column="0" Padding="8 0 0 0" />
-                      <TextBox Text="{Binding Input}" Grid.Row="4" Grid.Column="2"
-                               Grid.ColumnSpan="3" />
+                      <ctrls:ExtendedAutoCompleteBox Text="{Binding Input, Mode=TwoWay}"
+                                                     Suggestions="{Binding InputSuggestions}"
+                                                     IsBitfieldMode="False"
+                                                     Grid.Row="4"
+                                                     Grid.Column="2"
+                                                     Grid.ColumnSpan="3" />
                       <TextBlock Text="Parameter" Grid.Row="6" Grid.Column="0" Padding="8 0 0 0" />
                       <TextBox Text="{Binding Parameter}" Grid.Row="6" Grid.Column="2"
                                Grid.ColumnSpan="3" />
