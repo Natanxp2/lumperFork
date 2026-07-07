@@ -65,6 +65,9 @@ public abstract class EntityPropertyViewModel : HierarchicalBspNode
     [Reactive]
     public IReadOnlyCollection<ExtendedAutoCompleteItem> KeySuggestions { get; set; } = [];
 
+    public IReadOnlyCollection<ExtendedAutoCompleteItem> TargetEntityNameSuggestions =>
+        BspService.Instance.TargetnameIndex.Suggestions;
+
     public List<ExtendedAutoCompleteItem> FetchKeySuggestionsForClassname(string classname)
     {
         List<ExtendedAutoCompleteItem> suggestions = [];
@@ -126,8 +129,8 @@ public class EntityPropertyStringViewModel : EntityPropertyViewModel
             x => x.ParentEntity.Classname)
             .Subscribe(_ =>
             {
-                ValueSuggestions = FetchValueSuggestionsForKey();
                 IsBitfield = IsKeyBitfield();
+                this.RaisePropertyChanged(nameof(ValueSuggestions));
             });
     }
 
@@ -145,15 +148,15 @@ public class EntityPropertyStringViewModel : EntityPropertyViewModel
             this.RaisePropertyChanged();
 
             if (Key == "classname")
-                ((EntityViewModel)Parent).Classname = value;
+                Avalonia.Threading.Dispatcher.UIThread.Post(() => ((EntityViewModel)Parent).Classname = value);
 
             else if (Key == "targetname")
                 ((EntityViewModel)Parent).RaiseTargetnameChanged();
         }
     }
 
-    [Reactive]
-    public IReadOnlyCollection<ExtendedAutoCompleteItem> ValueSuggestions { get; set; } = [];
+    public IReadOnlyCollection<ExtendedAutoCompleteItem> ValueSuggestions => FetchValueSuggestionsForKey();
+
 
     [Reactive]
     public bool IsBitfield { get; set; } = false;
@@ -168,23 +171,45 @@ public class EntityPropertyStringViewModel : EntityPropertyViewModel
         return false;
     }
 
-    private List<ExtendedAutoCompleteItem> FetchValueSuggestionsForKey()
+    private IReadOnlyCollection<ExtendedAutoCompleteItem> FetchValueSuggestionsForKey()
     {
         List<ExtendedAutoCompleteItem> suggestions = [];
 
-        if (MomentumFGD.Entities.TryGetValue(ParentEntity.Classname, out FGDEntity? fgdEntity)
-            && fgdEntity.Properties.TryGetValue(Key, out FGDProperty? fgdProp))
+        if(Key == "classname")
         {
-            IReadOnlyDictionary<string, string> choices = fgdProp.Choices;
-
-            foreach (KeyValuePair<string, string> choice in choices)
+            foreach ( string? fgdKey in MomentumFGD.Entities.Keys)
             {
                 var item = new ExtendedAutoCompleteItem
                 {
-                    Value = choice.Key,
-                    Display = fgdProp.ValueType == "flags" ? choice.Value : $"[{choice.Key}] {choice.Value}"
+                    Value = fgdKey
                 };
                 suggestions.Add(item);
+            }
+        }
+        else if (Key == "target")
+        {
+            return BspService.Instance.TargetnameIndex?.Suggestions ?? [];
+        }
+        else if (MomentumFGD.Entities.TryGetValue(ParentEntity.Classname, out FGDEntity? fgdEntity)
+            && fgdEntity.Properties.TryGetValue(Key, out FGDProperty? fgdProp))
+        {
+            if(fgdProp.ValueType == "boolean")
+            {
+                suggestions.Add(new ExtendedAutoCompleteItem{ Value = 0, Display = "[0] False"});
+                suggestions.Add(new ExtendedAutoCompleteItem{ Value = 1, Display = "[1] True"});
+            }
+            else {
+                IReadOnlyDictionary<string, string> choices = fgdProp.Choices;
+
+                foreach (KeyValuePair<string, string> choice in choices)
+                {
+                    var item = new ExtendedAutoCompleteItem
+                    {
+                        Value = choice.Key,
+                        Display = fgdProp.ValueType == "flags" ? choice.Value : $"[{choice.Key}] {choice.Value}"
+                    };
+                    suggestions.Add(item);
+                }
             }
         }
         return suggestions;
@@ -235,8 +260,6 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
         });
     }
 
-
-
     public string IOKey
     {
         get => _ioKey;
@@ -265,9 +288,6 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
         }
     }
 
-    public IReadOnlyCollection<ExtendedAutoCompleteItem> TargetEntityNameSuggestions =>
-        BspService.Instance.TargetnameIndex.Suggestions;
-
     public string Input
     {
         get => _input;
@@ -282,8 +302,6 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
             OnValueChanged();
         }
     }
-
-
 
     public IReadOnlyCollection<ExtendedAutoCompleteItem> InputSuggestions =>
         _inputSuggestions ??= FetchInputSuggestions();
