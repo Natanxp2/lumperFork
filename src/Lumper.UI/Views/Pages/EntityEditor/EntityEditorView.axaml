@@ -229,15 +229,19 @@
                                                      IsBitfieldMode="False"
                                                      Grid.Row="0"
                                                      Grid.Column="0" />
-                      <!-- <TextBox Text="{Binding Key}" Grid.Row="0" Grid.Column="0" /> -->
                       <TextBox Text="{Binding DisplayValue}" Grid.Row="0" Grid.Column="2" IsReadOnly="True"
                                Foreground="Gray" />
                       <Button Command="{Binding Delete}" Grid.Row="0" Grid.Column="4" Height="32">
                         <materialIcons:MaterialIcon Kind="Delete" />
                       </Button>
+                      
                       <TextBlock Text="Target Entity Name" Grid.Row="2" Grid.Column="0" Padding="8 0 0 0" />
-                      <TextBox Text="{Binding TargetEntityName}" Grid.Row="2" Grid.Column="2"
-                               Grid.ColumnSpan="3" />
+                      <ctrls:ExtendedAutoCompleteBox Text="{Binding TargetEntityName, Mode=TwoWay}"
+                                                     Suggestions="{Binding TargetEntityNameSuggestions}"
+                                                     IsBitfieldMode="False"
+                                                     Grid.Row="2"
+                                                     Grid.Column="2"
+                                                     Grid.ColumnSpan="3" />
                       <TextBlock Text="Input" Grid.Row="4" Grid.Column="0" Padding="8 0 0 0" />
                       <TextBox Text="{Binding Input}" Grid.Row="4" Grid.Column="2"
                                Grid.ColumnSpan="3" />

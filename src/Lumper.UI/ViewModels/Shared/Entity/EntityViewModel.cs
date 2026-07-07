@@ -47,12 +47,22 @@ public class EntityViewModel : HierarchicalBspNode
         ResetClassname();
     }
 
+    public void RaiseTargetnameChanged()
+    {
+        this.RaisePropertyChanged(nameof(Targetname));
+        this.RaisePropertyChanged(nameof(ClassAndTargetname));
+    }
+
     public EntityPropertyViewModel AddProperty(Entity.EntityProperty prop)
     {
         var vm = EntityPropertyViewModel.Create(prop, this);
         Entity.Properties.Add(prop);
         Properties.Add(vm);
         MarkAsModified();
+
+        if (prop.Key == "targetname")
+            RaiseTargetnameChanged();
+
         return vm;
     }
 
@@ -61,6 +71,9 @@ public class EntityViewModel : HierarchicalBspNode
         Entity.Properties.Remove(propVm.Property);
         Properties.Remove(propVm);
         MarkAsModified();
+
+        if (propVm.Key == "targetname")
+            RaiseTargetnameChanged();
     }
 
     public void AddString()

@@ -7,6 +7,7 @@ using Lumper.Lib.Bsp.Struct;
 using Lumper.Lib.ExtensionMethods;
 using Lumper.Lib.FGD;
 using Lumper.UI.Controls;
+using Lumper.UI.Services;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -27,6 +28,7 @@ public abstract class EntityPropertyViewModel : HierarchicalBspNode
         set
         {
             bool wasClassname = _key == "classname";
+            bool wasTargetname = _key == "targetname";
 
             if (_key == value)
                 return;
@@ -42,6 +44,9 @@ public abstract class EntityPropertyViewModel : HierarchicalBspNode
                 ((EntityViewModel)Parent).ResetClassname();
             else if (value == "classname")
                 ((EntityViewModel)Parent).Classname = vm.Value;
+
+            if (wasTargetname || value == "targetname")
+                ((EntityViewModel)Parent).RaiseTargetnameChanged();
         }
     }
 
@@ -140,6 +145,9 @@ public class EntityPropertyStringViewModel : EntityPropertyViewModel
 
             if (Key == "classname")
                 ((EntityViewModel)Parent).Classname = value;
+
+            else if (Key == "targetname")
+                ((EntityViewModel)Parent).RaiseTargetnameChanged();
         }
     }
 
@@ -216,7 +224,10 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
 
         this.WhenAnyValue(x => x.ParentEntity.Classname)
             .Subscribe(_ => IOKeySuggestions = FetchIoKeySuggestions());
+
     }
+
+    
 
     public string IOKey
     {
@@ -252,6 +263,10 @@ public class EntityPropertyIoViewModel : EntityPropertyViewModel
             OnValueChanged();
         }
     }
+
+    public IReadOnlyCollection<ExtendedAutoCompleteItem> TargetEntityNameSuggestions => 
+        BspService.Instance.TargetnameIndex.Suggestions;
+
     public string Input
     {
         get => _input;
