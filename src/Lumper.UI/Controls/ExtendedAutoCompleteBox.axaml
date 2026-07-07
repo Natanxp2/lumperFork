@@ -41,19 +41,40 @@
                                 <ListBox Name="PART_StandardList" 
                                         IsVisible="{Binding !IsBitfieldMode, RelativeSource={RelativeSource TemplatedParent}}" 
                                         Background="Transparent" BorderThickness="0">
+                                    <ListBox.Styles>
+                                        <Style Selector="ListBoxItem">
+                                            <Setter Property="Padding" Value="8,4"/>
+                                            <Setter Property="MinHeight" Value="24"/>
+                                        </Style>
+                                    </ListBox.Styles>
                                     <ListBox.ItemTemplate>
                                         <DataTemplate x:DataType="local:ExtendedAutoCompleteItem">
-                                            <TextBlock Text="{Binding DisplayText}" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding DisplayText}" FontSize="14" VerticalAlignment="Center"/>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
 
                                 <ListBox Name="PART_BitfieldList" 
-                                        IsVisible="{Binding IsBitfieldMode, RelativeSource={RelativeSource TemplatedParent}}" 
-                                        Background="Transparent" BorderThickness="0">
+                                    IsVisible="{Binding IsBitfieldMode, RelativeSource={RelativeSource TemplatedParent}}" 
+                                    Background="Transparent" 
+                                    BorderThickness="0">
+                                    <ListBox.Styles>
+                                        <Style Selector="ListBoxItem">
+                                            <Setter Property="Padding" Value="6,2"/>
+                                            <Setter Property="MinHeight" Value="24"/>
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        </Style>
+                                    </ListBox.Styles>
                                     <ListBox.ItemTemplate>
                                         <DataTemplate x:DataType="local:ExtendedAutoCompleteItem">
-                                            <CheckBox Content="{Binding DisplayText}" IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center"/>
+                                            <CheckBox Content="{Binding DisplayText}" 
+                                                    IsChecked="{Binding IsChecked, Mode=TwoWay}" 
+                                                    HorizontalAlignment="Stretch"
+                                                    Background="Transparent"
+                                                    FontSize="14" 
+                                                    MinHeight="20"
+                                                    Padding="6,0,0,0"
+                                                    VerticalAlignment="Center"/>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
