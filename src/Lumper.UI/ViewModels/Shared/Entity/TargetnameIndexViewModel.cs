@@ -35,7 +35,10 @@ public sealed class TargetnameIndexViewModel : ViewModel, IDisposable
                     : Observable.Return<IReadOnlyCollection<EntityViewModel>>([])
             )
             .Switch()
-            .Throttle(TimeSpan.FromMilliseconds(200), RxApp.TaskpoolScheduler)
+            .Publish(shared =>
+                    Observable.Merge(
+                        shared.Take(1),
+                        shared.Skip(1).Throttle(TimeSpan.FromMilliseconds(200), RxApp.TaskpoolScheduler)))
             .Select(entities =>
                 entities
                     .Where(e => !string.IsNullOrEmpty(e.Targetname))
