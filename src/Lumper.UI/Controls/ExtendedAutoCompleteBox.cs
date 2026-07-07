@@ -35,6 +35,7 @@ public class ExtendedAutoCompleteBox : TemplatedControl
     private ListBox? _bitfieldList;
     private bool _isUpdatingText;
     private bool _isNavigating;
+    private bool _isInitializing;
 
     public ObservableCollection<ExtendedAutoCompleteItem> FilteredSuggestions { get; } = [];
 
@@ -229,6 +230,8 @@ public class ExtendedAutoCompleteBox : TemplatedControl
 
     private void InitializeBitfieldCheckboxes()
     {
+        _isInitializing = true;
+
         if (Suggestions == null || string.IsNullOrEmpty(Text)) return;
 
         if (long.TryParse(Text, out long currentBitfieldValue))
@@ -248,10 +251,14 @@ public class ExtendedAutoCompleteBox : TemplatedControl
                 }
             }
         }
+
+        _isInitializing = false;
     }
 
     private void CalculateBitfieldSum()
     {
+        if(_isInitializing) return;
+        
         long sum = 0;
         if (Suggestions != null)
         {
@@ -266,6 +273,9 @@ public class ExtendedAutoCompleteBox : TemplatedControl
                 }
             }
         }
+
+        if (long.TryParse(Text, out long currentValue) && currentValue == sum)
+            return;
 
         _isUpdatingText = true;
         Text = sum.ToString(CultureInfo.InvariantCulture);
