@@ -129,6 +129,7 @@ public class ExtendedAutoCompleteBox : TemplatedControl
 
         if (IsBitfieldMode)
         {
+            InitializeBitfieldCheckboxes();
             CalculateBitfieldSum();
         }
         else
@@ -223,6 +224,29 @@ public class ExtendedAutoCompleteBox : TemplatedControl
         else if (e.PropertyName is (nameof(ExtendedAutoCompleteItem.Display)) or (nameof(ExtendedAutoCompleteItem.Value)))
         {
             UpdateFilteredSuggestions(showAll: IsBitfieldMode || IsDropdownOpen);
+        }
+    }
+
+    private void InitializeBitfieldCheckboxes()
+    {
+        if (Suggestions == null || string.IsNullOrEmpty(Text)) return;
+
+        if (long.TryParse(Text, out long currentBitfieldValue))
+        {
+            foreach (ExtendedAutoCompleteItem item in Suggestions)
+            {
+                if (item.Value != null && long.TryParse(item.Value.ToString(), out long flagValue))
+                {
+                    if (flagValue != 0)
+                    {
+                        item.IsChecked = (currentBitfieldValue & flagValue) == flagValue;
+                    }
+                    else
+                    {
+                        item.IsChecked = currentBitfieldValue == 0;
+                    }
+                }
+            }
         }
     }
 
